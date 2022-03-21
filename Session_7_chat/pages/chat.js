@@ -20,13 +20,28 @@ class Chat {
 
   constructor() {
     this.container.appendChild(this.conversationList.container);
+    this.container.classList.add("container");
     this.conversationList.setOnConversationItemClick(
       this.setActiveConversation
     );
-    this.container.appendChild(this.conversationInfor.container);
-    this.container.appendChild(this.composer.container);
-    this.container.appendChild(this.messageList.container);
-    this.container.appendChild(this.userList.container);
+    this.conversationList.container.classList.add("left-content");
+
+    const divContent = document.createElement("div");
+    divContent.classList.add("right-content");
+    this.container.appendChild(divContent);
+    divContent.appendChild(this.conversationInfor.container);
+
+    const divMainContent = document.createElement("div")
+    divContent.appendChild(divMainContent);
+    divMainContent.classList.add("right__main-content")
+
+    const divMessages = document.createElement("div");
+    divMainContent.appendChild(divMessages)
+    divMessages.appendChild(this.messageList.container);
+    divMessages.appendChild(this.composer.container);
+
+    divMainContent.appendChild(this.userList.container);
+
     this.subcribeConversation();
   }
 
@@ -36,6 +51,7 @@ class Chat {
     this.conversationList.setStyleActiveConversation(conversation);
 
     this.composer.setActiveConversation(conversation);
+    console.log("123", conversation);
     this.userList.setActiveConversation(conversation);
 
     this.messageList.clearMessage();
@@ -47,7 +63,7 @@ class Chat {
     db.collection("conversations").onSnapshot((snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
-          console.log("New conversation: ", change.doc.data());
+          console.log("New conversation: ");
 
           this.conversationList.handleCreateConversationAdded(
             change.doc.id,
@@ -56,10 +72,15 @@ class Chat {
           );
         }
         if (change.type === "modified") {
-          console.log("Modified conversation: ", change.doc.data());
+          console.log("Modified conversation: ");
+          this.userList.setActiveConversation({
+            id: change.doc.id,
+            name: change.doc.data().name,
+            users: change.doc.data().users,
+          });
         }
         if (change.type === "removed") {
-          console.log("Removed conversation: ", change.doc.data());
+          console.log("Removed conversation: ");
           this.conversationList.removedItem(change.doc.id);
         }
       });

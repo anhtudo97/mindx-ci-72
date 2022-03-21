@@ -22,12 +22,16 @@ class UserList {
 
   handleAddNewUser = (event) => {
     event.preventDefault();
+    const newUserList = this.activeConversation.users.concat(this.input.value);
+
+    db.collection("conversations").doc(this.activeConversation.id).update({
+      users: newUserList,
+    });
   };
 
   setActiveConversation = (conversation) => {
     this.activeConversation = conversation;
     this.userList.innerHTML = "";
-    console.log(conversation)
     conversation.users.forEach((user) => {
       const li = document.createElement("li");
       li.innerHTML = user;
