@@ -1,0 +1,29 @@
+.header {
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+.container {
+  display: flex;
+}
+
+.left-content {
+  flex: 1;
+}
+
+.right-content {
+  flex: 2;
+}
+
+.right__main-content {
+  display: flex;
+  width: 100%;
+}
+
+.right__main-content > .chat-container {
+  flex: 2;
+}
+
+.owner-message{
+  text-align: right;
+}

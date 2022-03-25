@@ -62,6 +62,14 @@ class ConversationList {
   handleVisible = () => {
     this.createConversationForm.setVisible(true);
   };
+
+  handleConversationUpdated = (id, name, users) => {
+    this.conversations.forEach((conversation) => {
+      if (conversation.id === id) {
+        conversation.setUsers(users);
+      }
+    });
+  };
 }
 
 export { ConversationList };

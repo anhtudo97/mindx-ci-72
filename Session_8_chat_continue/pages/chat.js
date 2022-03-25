@@ -31,12 +31,13 @@ class Chat {
     this.container.appendChild(divContent);
     divContent.appendChild(this.conversationInfor.container);
 
-    const divMainContent = document.createElement("div")
+    const divMainContent = document.createElement("div");
     divContent.appendChild(divMainContent);
-    divMainContent.classList.add("right__main-content")
+    divMainContent.classList.add("right__main-content");
 
     const divMessages = document.createElement("div");
-    divMainContent.appendChild(divMessages)
+    divMessages.classList.add("chat-container")
+    divMainContent.appendChild(divMessages);
     divMessages.appendChild(this.messageList.container);
     divMessages.appendChild(this.composer.container);
 
@@ -59,31 +60,43 @@ class Chat {
   };
 
   subcribeConversation = () => {
-    db.collection("conversations").onSnapshot((snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          console.log("New conversation: ");
+    db.collection("conversations")
+      // Iterator array to find current user is logged
+      .where("users", "array-contains", firebase.auth().currentUser.email)
+      .onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            console.log("New conversation: ");
 
-          this.conversationList.handleCreateConversationAdded(
-            change.doc.id,
-            change.doc.data().name,
-            change.doc.data().users
-          );
-        }
-        if (change.type === "modified") {
-          console.log("Modified conversation: ");
-          this.userList.setActiveConversation({
-            id: change.doc.id,
-            name: change.doc.data().name,
-            users: change.doc.data().users,
-          });
-        }
-        if (change.type === "removed") {
-          console.log("Removed conversation: ");
-          this.conversationList.removedItem(change.doc.id);
-        }
+            this.conversationList.handleCreateConversationAdded(
+              change.doc.id,
+              change.doc.data().name,
+              change.doc.data().users
+            );
+          }
+          if (change.type === "modified") {
+            console.log("Modified conversation: ");
+
+            // Update conversation information
+            this.conversationList.handleConversationUpdated(
+              change.doc.id,
+              change.doc.data().name,
+              change.doc.data().users
+            );
+
+            // Update list user
+            this.userList.setActiveConversation({
+              id: change.doc.id,
+              name: change.doc.data().name,
+              users: change.doc.data().users,
+            });
+          }
+          if (change.type === "removed") {
+            console.log("Removed conversation: ");
+            this.conversationList.removedItem(change.doc.id);
+          }
+        });
       });
-    });
   };
 
   // listener
